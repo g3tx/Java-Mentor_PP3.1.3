@@ -1,22 +1,25 @@
 //Запуск функций - постоянно:
-navBar();
+navBarAdmin();
 showAllUsers();
-showUserInfo();
+showAdminInfo();
 //Запуск по клику:
 //createUser();
 //editUser();
 //deleteUser();
 /*-----------------------------------------------------------------------------------------------------------*/
-function navBar() {
-    fetch('http://localhost:8080/admin/userinfo')
+function navBarAdmin() {
+    fetch('http://localhost:8080/info/principal', {
+        method: "GET",
+        headers: {"Accept": "application/json; charset=UTF-8"}
+    })
         .then(response => response.json())
-        .then(user => {
+        .then(userBar => {
             //console.log(user);
-            document.getElementById("nav_email").innerHTML = user.email;
+            document.getElementById("nav_email").innerHTML = userBar.email;
             let stringOfRoles = document.createElement('ul');
-            for (let i = 0; i < user.roles.length; i++) {
+            for (let i = 0; i < userBar.roles.length; i++) {
                 let role = document.createElement('li');
-                role.textContent = user.roles[i].roleName + " ";
+                role.textContent = userBar.roles[i].roleNameWithoutSuf + " ";
                 stringOfRoles.appendChild(role);
             }
             // console.log(stringOfRoles);
@@ -29,7 +32,7 @@ function listOfRoles(user) {
     let listOfRoles = document.createElement('ul');
     for (let i = 0; i < user.roles.length; i++) {
         let role = document.createElement('li');
-        role.textContent = user.roles[i].roleName + " ";
+        role.textContent = user.roles[i].roleNameWithoutSuf + " ";
         listOfRoles.appendChild(role);
     }
     return listOfRoles;
@@ -39,13 +42,18 @@ function listOfRoles(user) {
 function showAllUsers() {
     let tableAllUsers = document.getElementById("tableAllUsers");
     tableAllUsers.innerHTML = ""; //очищаем таблицу перед выводом на экран
-    fetch('http://localhost:8080/admin/all')
+
+    fetch('http://localhost:8080/admin/all', {
+        method: "GET",
+        headers: {"Accept": "application/json; charset=UTF-8"}
+    })
         .then(response => response.json())
         .then(users => {
             //console.log(users);
             users.forEach(function (user) {
                 let row = tableAllUsers.insertRow();
-                row.setAttribute("rowId", user.userId);
+                //https://metanit.com/web/javascript/20.5.php
+                row.setAttribute("rowId", "row" + user.userId);
                 let n1 = row.insertCell();
                 n1.innerHTML = new Number(user.userId).toFixed();
                 let n2 = row.insertCell();
@@ -68,14 +76,18 @@ function showAllUsers() {
 }
 
 /*-----------------------------------------------------------------------------------------------------------*/
-function showUserInfo() {
-    let tableUserInfo = document.getElementById("tableUserInfo");
-    tableUserInfo.innerHTML = "";
-    fetch('http://localhost:8080/admin/userinfo')
+function showAdminInfo() {
+    let tableAdminInfo = document.getElementById("tableAdminInfo");
+    tableAdminInfo.innerHTML = "";
+
+    fetch('http://localhost:8080/info/principal', {
+        method: "GET",
+        headers: {"Accept": "application/json; charset=UTF-8"}
+    })
         .then(response => response.json())
         .then(user => {
             // console.log(user)
-            let row = tableUserInfo.insertRow();
+            let row = tableAdminInfo.insertRow();
             let n1 = row.insertCell();
             n1.innerHTML = new Number(user.userId).toFixed();
             let n2 = row.insertCell();
@@ -93,37 +105,34 @@ function showUserInfo() {
 
 /*-----------------------------------------------------------------------------------------------------------*/
 function createUser() {
-    let tableAllUsers = document.getElementById("tableAllUsers");
-    let roles_new = "";
-    let roles_new_selected = document.getElementById("roles_new")
 
-    let roles = document.createElement('ul');
+    let tableAllUsers = document.getElementById("tableAllUsers");
+    let roles_new = [];
+    let roles_new_selected = document.getElementById("roles_new").options
+
     for (let i = 0; i < roles_new_selected.length; i++) {
-        let option = roles_new_selected.options[i];
-        let role = document.createElement('li');
-        if (option.selected) {
-            roles_new = roles_new.concat(option.value + (i != (roles_new_selected.length - 1) ? "," : ""))
-            role.textContent = option.value + " ";
-            roles.appendChild(role);
+        if (roles_new_selected[i].selected) {
+            roles_new.push(JSON.parse('{"roleId":"' + roles_new_selected[i].id.substr(16) + '", "roleName":"' + roles_new_selected[i].value + '"}'));
         }
     }
-    console.log(roles_new);
+
+    let body = {
+        firstName: document.getElementById("firstname_new").value,
+        lastName: document.getElementById("lastname_new").value,
+        age: document.getElementById("age_new").value,
+        email: document.getElementById("email_new").value,
+        password: document.getElementById("password_new").value,
+        roles: roles_new
+    }
+
     fetch('http://localhost:8080/admin/add', {
         method: 'POST',
-        body: JSON.stringify({
-            firstName: document.getElementById("firstname_new").value,
-            lastName: document.getElementById("lastname_new").value,
-            age: document.getElementById("age_new").value,
-            email: document.getElementById("email_new").value,
-            password: document.getElementById("password_new").value,
-            roles: roles_new
-        }),
-        headers: {"Content-type": "application/json", "Accept": "application/json"}
+        headers: {"Content-type": "application/json; charset=UTF-8", "Accept": "application/json; charset=UTF-8"},
+        body: JSON.stringify(body),
     })
-        .then(response => response.json())
+        .then(user => user.json())
         .then(user => {
-            console.log(user)
-            let row = tableAllUsers.insertRow(-1);
+            let row = tableAllUsers.insertRow();
             let n1 = row.insertCell();
             n1.innerHTML = new Number(user.userId).toFixed();
             let n2 = row.insertCell();
@@ -140,64 +149,75 @@ function createUser() {
             n7.innerHTML = '<button type="button" onclick="modalEditUser(' + user.userId + ')" class="btn-sm btn-info">Edit</button>';
             let n8 = row.insertCell();
             n8.innerHTML = '<button type="button" onclick="modalDeleteUser(' + user.userId + ')" class="btn-sm btn-danger">Delete</button>';
-            //https://ask-dev.ru/info/458/add-table-row-in-jquery
-        })
-        .catch((error) => console.error(error));
-}
-
-/*-----------------------------------------------------------------------------------------------------------*/
-function editUser() {
-    let listOfRoles_ed = "";
-    let roleSelect = document.getElementById("roles_edit");
-    let userId = document.getElementById("id_ed").value;
-
-    let listOfRoles = document.createElement('ul');
-    for (let i = 0; i < roleSelect.length; i++) {
-        let option = roleSelect.options[i];
-        let role = document.createElement('li');
-        if (option.selected) {
-            listOfRoles_ed = listOfRoles_ed.concat(option.value + (i != (roleSelect.length - 1) ? "," : ""))
-            role.textContent = option.value + " ";
-            listOfRoles.appendChild(role);
-        }
-    }
-
-    fetch('http://localhost:8080/admin/edit', {
-        method: 'PUT',
-        body: JSON.stringify({
-            userId: document.getElementById("id_ed").value,
-            firstName: document.getElementById("firstname_ed").value,
-            lastName: document.getElementById("lastname_ed").value,
-            age: document.getElementById("age_ed").value,
-            email: document.getElementById("email_ed").value,
-            password: document.getElementById("password_ed").value,
-            roles: listOfRoles_ed
-        }),
-        headers: {"Content-type": "application/json", "Accept": "application/json"}
-    })
-        .then(response => {
-            $('#' + userId).replaceWith('<tr id=' + userId + '>' +
-                '<td>' + userId + '</td>' +
-                '<td>' + document.getElementById("firstname_ed").value + '</td>' +
-                '<td>' + document.getElementById("lastname_ed").value + '</td>' +
-                '<td>' + document.getElementById("age_ed").value + '</td>' +
-                '<td>' + document.getElementById("email_ed").value + '</td>' +
-                '<td>' + listOfRoles.textContent + '</td>' +
-                '<td> <button type="button" onclick="modalEditUser(' + userId + ')" class="btn-sm btn-info">Edit</button> </td>' +
-                '<td> <button type="button" onclick="modalDeleteUser(' + userId + ')" class="btn-sm btn-danger">Delete</button> </td>' +
-                '</tr>');
         });
 }
 
 /*-----------------------------------------------------------------------------------------------------------*/
-function deleteUser(id) {
-    fetch('http://localhost:8080/admin/delete/' + id, {
-        method: 'DELETE',
-        headers: {"Content-type": "application/json", "Accept": "application/json"}
+function editUser() {
+
+    let userId = document.getElementById("id_ed").value;
+    let rowEdit = document.querySelector(`[rowId="row${userId}"]`);
+
+    let roles_edit = [];
+    let roles_edit_selected = document.getElementById("roles_ed").options
+
+    for (let i = 0; i < roles_edit_selected.length; i++) {
+        if (roles_edit_selected[i].selected) {
+            roles_edit.push(JSON.parse('{"roleId":"' + roles_edit_selected[i].id.substr(15) + '", "roleName":"' + roles_edit_selected[i].value + '"}'));
+        }
+    }
+
+    let user = {
+        userId: userId,
+        firstName: document.getElementById("firstname_ed").value,
+        lastName: document.getElementById("lastname_ed").value,
+        age: document.getElementById("age_ed").value,
+        email: document.getElementById("email_ed").value,
+        password: document.getElementById("password_ed").value,
+        roles: roles_edit
+    }
+
+    fetch('http://localhost:8080/admin/edit', {
+        method: 'PUT',
+        headers: {"Content-type": "application/json; charset=UTF-8"},
+        body: JSON.stringify(user),
     })
-        .then(() => {
-            console.log('removed');
-    });
+        .then(response => response.json())
+        .then(user => {
+            rowEdit.innerHTML = ""; //очищаем выбранную строку
+            let n1 = rowEdit.insertCell();
+            n1.innerHTML = new Number(user.userId).toFixed();
+            let n2 = rowEdit.insertCell();
+            n2.innerHTML = user.firstName;
+            let n3 = rowEdit.insertCell();
+            n3.innerHTML = user.lastName;
+            let n4 = rowEdit.insertCell();
+            n4.innerHTML = user.age;
+            let n5 = rowEdit.insertCell();
+            n5.innerHTML = user.email;
+            let n6 = rowEdit.insertCell();
+            n6.innerHTML = listOfRoles(user).textContent;
+            let n7 = rowEdit.insertCell();
+            n7.innerHTML = '<button type="button" onclick="modalEditUser(' + user.userId + ')" class="btn-sm btn-info">Edit</button>';
+            let n8 = rowEdit.insertCell();
+            n8.innerHTML = '<button type="button" onclick="modalDeleteUser(' + user.userId + ')" class="btn-sm btn-danger">Delete</button>';
+        });
+}
+
+/*-----------------------------------------------------------------------------------------------------------*/
+function deleteUser() {
+    let userId = document.getElementById("id_del").value;
+    fetch('http://localhost:8080/admin/delete/' + userId, {
+        method: 'DELETE',
+        headers: {"Content-type": "application/json; charset=UTF-8"}
+    })
+        .then(user => {
+            document.querySelector(`[rowId="row${userId}"]`).remove()
+            //$('#' + userId).remove();
+            //$('tr:last-child').remove();
+            //$('#tableAllUsers tr[data-rowid=userId]').remove();
+        });
+    ;
 }
 
 /*-----------------------------------------------------------------------------------------------------------*/
@@ -214,17 +234,16 @@ function modalEditUser(id) {
             $('#password_ed').val(user.password)
             for (let i = 0; i < user.roles.length; i++) {
                 if (user.roles[i].roleName == "ROLE_ADMIN") {
-                    $('#admin_select_ed').atr('selected', 'selected')
+                    $('#admin_select_ed').attr('selected', 'selected')
                 }
                 if (user.roles[i].roleName == "ROLE_USER") {
                     $('#user_select_ed').attr('selected', 'selected')
                 }
             }
-            $('#modalEditUser').modal() //запускаем модал
-
+            $('#modalEditUser').modal("show") //запускаем модал
             $('#modalEditUser').on('hidden.bs.modal', function () { //очищает выделенные роли при закрытии
-                $('#admin_select_ed').removeAttr('selected')
-                $('#user_select_ed').removeAttr('selected')
+                $('#role_select_ed_1').removeAttr('selected')
+                $('#role_select_ed_2').removeAttr('selected')
             });
         });
 }
@@ -243,15 +262,14 @@ function modalDeleteUser(id) {
             $('#password_del').val(user.password)
             for (let i = 0; i < user.roles.length; i++) {
                 if (user.roles[i].roleName == "ROLE_ADMIN") {
-                    $('#admin_select_del').attr('selected', 'selected')
+                    $('#role_select_del_1').attr('selected', 'selected')
                 }
                 if (user.roles[i].roleName == "ROLE_USER") {
-                    $('#user_select_del').attr('selected', 'selected')
+                    $('#role_select_del_2').attr('selected', 'selected')
                 }
             }
 
             $('#modalDeleteUser').modal()
-
             $('#modalDeleteUser').on('hidden.bs.modal', function () {
                 $('#admin_select_del').removeAttr('selected')
                 $('#user_select_del').removeAttr('selected')

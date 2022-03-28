@@ -12,7 +12,6 @@
 
     <title>Admin panel</title>
 
-
 </head>
 <body class="bg-light">
 
@@ -35,7 +34,7 @@
         <!--левая боковая панель-->
         <div class="col-2 p-0 mt-2 bg-white list-group">
             <ul class="nav nav-pills my-2 flex-column"> <!--вертикально кнопками-->
-                <li class="nav-item" id="adminLeftMenu"><a class="nav-link active border" data-toggle="tab" href="#adminLeftMenuButton">Admin</a></li>
+                <li class="nav-item" id="adminLeftMenu"><a class="nav-link active" data-toggle="tab" href="#adminLeftMenuButton">Admin</a></li>
                 <li class="nav-item" id="userLeftMenu"><a class="nav-link" data-toggle="tab" href="#userLeftMenuButton">User</a></li>
             </ul>
         </div>
@@ -52,12 +51,9 @@
 
                 <!--вкладка все пользователи-->
                 <div class="row tab-content">
-                    <div class="col mx-3 border rounded-bottom tab-pane active" id="usersTable">
-                        <nav class="navbar border rounded-top" style="background-color: #f5f5f5;">
-                            <span class="navbar-brand h1">All users</span>
-                        </nav>
-
-                        <div class="row bg-white">
+                    <div class="col mx-3 border-top border-left border-right rounded tab-pane active" id="usersTable" style="background-color: #f5f5f5;">
+                        <div class="col px-0"><span class="navbar-brand h1 my-2">All users</span></div>
+                        <div class="row bg-white border rounded-bottom">
                             <div class="col my-3">
                                 <table class="table table-striped"> <!--полосатая таблица-->
                                     <thead>
@@ -81,38 +77,35 @@
                     <!-- вкладка добавить пользователя -->
                     <div class="col mx-3 border rounded bg-white tab-pane" id="newUser">
                         <div class="row">
-                            
-                        <nav class="navbar border rounded-top" style="background-color: #f5f5f5;">
-                            <span class="navbar-brand h1">Add new user</span>
-                        </nav>
+                            <div class="col border-bottom" style="background-color: #f5f5f5;"><span class="navbar-brand h1 my-2">Add new user</span></div>
                         </div>
 
                         <form class="font-weight-bold col-3 align-items-center justify-content-center mx-auto" id="form_newUser">
                             <div class="form-group text-center my-3">
                                 <label for="firstname_new">First name</label>
-                                <input type="text" class="form-control" placeholder="First name" id="firstname_new" required autofocus>
+                                <input type="text" class="form-control" placeholder="First name" id="firstname_new" autofocus>
                             </div>
                             <div class="form-group text-center">
                                 <label for="lastname_new">Last name</label>
-                                <input type="text" class="form-control" placeholder="Last name" id="lastname_new" required>
+                                <input type="text" class="form-control" placeholder="Last name" id="lastname_new">
                             </div>
                             <div class="form-group text-center">
                                 <label for="age_new">Age</label>
-                                <input type="number" class="form-control" placeholder="Age" id="age_new" required>
+                                <input type="number" class="form-control" placeholder="Age" id="age_new">
                             </div>
                             <div class="form-group text-center">
                                 <label for="email_new">Email</label>
-                                <input type="email" class="form-control" placeholder="Email" id="email_new" required>
+                                <input type="email" class="form-control" placeholder="Email" id="email_new">
                             </div>
                             <div class="form-group text-center">
                                 <label for="password_new">Password</label>
-                                <input type="password" class="form-control" placeholder="Password" id="password_new" required>
+                                <input type="password" class="form-control" placeholder="Password" id="password_new" autocomplete="off">
                             </div>
                             <div class="form-group text-center">
                                 <label for="roles_new">Role</label>
-                                <select multiple class="custom-select form-control" size="2" id="roles_new" name="roles_new" required>
-                                    <option value="ROLE_USER" label="USER"></option>
-                                    <option value="ROLE_ADMIN" label="ADMIN"></option>
+                                <select multiple class="custom-select form-control" size="2" id="roles_new" name="roles_new">
+                                    <option value="ROLE_USER" label="USER" id="role_select_new_2"></option>
+                                    <option value="ROLE_ADMIN" label="ADMIN" id="role_select_new_1"></option>
                                 </select>
                                 <button onclick="createUser()" type="submit" class="btn btn-success my-3">Add new user</button>
                             </div>
@@ -143,7 +136,7 @@
                                         <th scope="col">Role</th>
                                     </tr>
                                     </thead>
-                                    <tbody id="tableUserInfo"></tbody>
+                                    <tbody id="tableAdminInfo"></tbody>
                                 </table>
                             </div>
                         </div>
@@ -187,20 +180,20 @@
                         </div>
                         <div class="form-group">
                             <label for="password_ed" class="col-6 mx-auto justify-content-center font-weight-bold">Password</label>
-                            <input type="password" class="form-control" id="password_ed" name="password_ed">
+                            <input type="password" class="form-control" id="password_ed" name="password_ed" autocomplete="off">
                         </div>
                         <div class="form-group">
                             <label for="roles_ed" class="col-6 mx-auto justify-content-center font-weight-bold">Role</label>
                             <select multiple class="form-control" size="2" id="roles_ed" name="roles_ed">
-                                <option value="ROLE_USER" label="USER" id="user_select_ed"></option>
-                                <option value="ROLE_ADMIN" label="ADMIN" id="admin_select_ed"></option>
+                                <option value="ROLE_USER" label="USER" id="role_select_ed_2"></option>
+                                <option value="ROLE_ADMIN" label="ADMIN" id="role_select_ed_1"></option>
                             </select>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button onclick="editUser()" type="submit" class="btn btn-primary">Edit</button>
+                    <button onclick="editUser()" type="submit" class="btn btn-primary" data-dismiss="modal">Edit</button>
                 </div>
             </div>
         </div>
@@ -247,7 +240,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button onclick="deleteUser()" type="submit" class="btn btn-danger">Delete</button>
+                    <button onclick="deleteUser()" type="submit" class="btn btn-danger" data-dismiss="modal">Delete</button>
                 </div>
             </div>
         </div>
@@ -268,7 +261,7 @@
         crossorigin="anonymous"></script>
 
 <!-- My script -->
-<script src="/js/myscript3.js"></script>
+<script src="/js/adminscript.js"></script>
 
 </body>
 </html>

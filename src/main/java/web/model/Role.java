@@ -22,7 +22,6 @@ public class Role implements GrantedAuthority {
 
     @ManyToMany(mappedBy = "roles")
     @JsonBackReference
-    //@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "user_id")
     private Set<User> users;
 
     public Role() {
@@ -78,8 +77,8 @@ public class Role implements GrantedAuthority {
         return roleName;
     }
 
-/*  //убираем приставку ROLE (нужно для отображения в таблице)
-    public String getRolenameWithoutSuf() {
-        return rolename.replace("ROLE_", "");
-    }*/
+  //убираем приставку ROLE (нужно для отображения в таблице)
+    public String getRoleNameWithoutSuf() {
+        return roleName.replace("ROLE_", "");
+    }
 }

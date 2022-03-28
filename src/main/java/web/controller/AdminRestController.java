@@ -11,8 +11,6 @@ import web.model.User;
 import web.service.RoleService;
 import web.service.UserService;
 
-import java.util.Set;
-
 @RestController
 public class AdminRestController {
 
@@ -22,38 +20,26 @@ public class AdminRestController {
     @Autowired
     private RoleService roleService;
 
-    @GetMapping("/admin/userinfo")
-    public ResponseEntity<User> showUserInfo() {
-        UserDetails details = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = (User) userService.loadUserByUsername(details.getUsername());
-        return new ResponseEntity<>(user, HttpStatus.OK);
-    }
-
     @GetMapping("/admin/roles")
     public ResponseEntity<Iterable<Role>> showAllRoles() {
-        return new ResponseEntity<>(roleService.getAllRoles(), HttpStatus.OK);
+        return ResponseEntity.ok().body(roleService.getAllRoles());
     }
 
     @GetMapping("/admin/all")
     public ResponseEntity<Iterable<User>> showAllUsers() {
-        return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
-    }
-
-    @GetMapping("/admin/info/{id}")
-    public ResponseEntity<User> showUserById(@PathVariable Long id) {
-        return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
+        return ResponseEntity.ok().body(userService.getAllUsers());
     }
 
     @PostMapping("/admin/add")
     public ResponseEntity<User> newUser(@RequestBody User newUser) {
         userService.saveUser(newUser);
-        return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+        return ResponseEntity.ok().body(newUser);
     }
 
     @PutMapping("/admin/edit")
     public ResponseEntity<User> editUser(@RequestBody User editUser) {
         userService.saveUser(editUser);
-        return new ResponseEntity<>(editUser, HttpStatus.OK);
+        return ResponseEntity.ok().body(editUser);
     }
 
     @DeleteMapping("/admin/delete/{id}")

@@ -122,7 +122,7 @@ public class User implements UserDetails {
         }
     }*/
 
-    public void setRoles(Set<Role> roles) { //если оставить этот сет, то через postman запрос выполнится
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 
@@ -189,7 +189,3 @@ public class User implements UserDetails {
                 '}';
     }
 }
-/*
- "message": "Type definition error: [simple type, class org.springframework.security.core.GrantedAuthority]; nested exception is com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Cannot construct instance of `org.springframework.security.core.GrantedAuthority` (no Creators, like default constructor, exist): abstract types either need to be mapped to concrete types, have custom deserializer, or contain additional type information\n at [Source: (PushbackInputStream); line: 17, column: 9] (through reference chain: web.model.User[\"authorities\"]->java.util.HashSet[1])",
- "path": "/admin/add"*/
-//https://stackoverflow.com/questions/27911591/can-not-deserialize-instance-of-java-lang-string-out-of-start-array-token
