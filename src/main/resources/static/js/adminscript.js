@@ -130,11 +130,9 @@ function createUser() {
             headers: {"Content-type": "application/json; charset=UTF-8", "Accept": "application/json; charset=UTF-8"},
             body: JSON.stringify(user),
         })
-            .then(response => response.json())
-            .then(users => {
-                /*  users.forEach(function (user) {
+            .then(user => user.json())
+            .then(user => {
                 let row = tableAllUsers.insertRow();
-                row.setAttribute("rowId", "row" + user.userId);
                 let n1 = row.insertCell();
                 n1.innerHTML = new Number(user.userId).toFixed();
                 let n2 = row.insertCell();
@@ -151,7 +149,6 @@ function createUser() {
                 n7.innerHTML = '<button type="button" onclick="modalEditUser(' + user.userId + ')" class="btn-sm btn-info">Edit</button>';
                 let n8 = row.insertCell();
                 n8.innerHTML = '<button type="button" onclick="modalDeleteUser(' + user.userId + ')" class="btn-sm btn-danger">Delete</button>';
-            })*/
             });
 }
 
