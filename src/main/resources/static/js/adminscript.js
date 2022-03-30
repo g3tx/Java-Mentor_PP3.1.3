@@ -104,7 +104,7 @@ function showAdminInfo() {
 }
 
 /*-----------------------------------------------------------------------------------------------------------*/
-function createUser() {
+async function createUser() {
 
     let tableAllUsers = document.getElementById("tableAllUsers");
     let roles_new = [];
@@ -125,31 +125,33 @@ function createUser() {
         roles: roles_new
     }
 
-        fetch('http://localhost:8080/admin/add', {
-            method: 'POST',
-            headers: {"Content-type": "application/json; charset=UTF-8", "Accept": "application/json; charset=UTF-8"},
-            body: JSON.stringify(user),
-        })
-            .then(user => user.json())
-            .then(user => {
-                let row = tableAllUsers.insertRow();
-                let n1 = row.insertCell();
-                n1.innerHTML = new Number(user.userId).toFixed();
-                let n2 = row.insertCell();
-                n2.innerHTML = user.firstName;
-                let n3 = row.insertCell();
-                n3.innerHTML = user.lastName;
-                let n4 = row.insertCell();
-                n4.innerHTML = user.age;
-                let n5 = row.insertCell();
-                n5.innerHTML = user.email;
-                let n6 = row.insertCell();
-                n6.innerHTML = listOfRoles(user).textContent;
-                let n7 = row.insertCell();
-                n7.innerHTML = '<button type="button" onclick="modalEditUser(' + user.userId + ')" class="btn-sm btn-info">Edit</button>';
-                let n8 = row.insertCell();
-                n8.innerHTML = '<button type="button" onclick="modalDeleteUser(' + user.userId + ')" class="btn-sm btn-danger">Delete</button>';
-            });
+    const response = await fetch('http://localhost:8080/admin/add', {
+        method: 'POST',
+        headers: {"Content-type": "application/json; charset=UTF-8", "Accept": "application/json; charset=UTF-8"},
+        body: JSON.stringify(user),
+    })
+
+    if (response.ok === true) {
+        const user = await response.json();
+        let row = tableAllUsers.insertRow();
+        row.setAttribute("rowId", "row" + user.userId);
+        let n1 = row.insertCell();
+        n1.innerHTML = new Number(user.userId).toFixed();
+        let n2 = row.insertCell();
+        n2.innerHTML = user.firstName;
+        let n3 = row.insertCell();
+        n3.innerHTML = user.lastName;
+        let n4 = row.insertCell();
+        n4.innerHTML = user.age;
+        let n5 = row.insertCell();
+        n5.innerHTML = user.email;
+        let n6 = row.insertCell();
+        n6.innerHTML = listOfRoles(user).textContent;
+        let n7 = row.insertCell();
+        n7.innerHTML = '<button type="button" onclick="modalEditUser(' + user.userId + ')" class="btn-sm btn-info">Edit</button>';
+        let n8 = row.insertCell();
+        n8.innerHTML = '<button type="button" onclick="modalDeleteUser(' + user.userId + ')" class="btn-sm btn-danger">Delete</button>';
+    }
 }
 
 /*-----------------------------------------------------------------------------------------------------------*/
